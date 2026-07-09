@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Analista interno. Login via Entra ID; guarda o necessário para o sync do Graph.
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  // Refresh token do Graph, sempre criptografado antes de persistir.
+  refreshToken String?
+  // Cursor do delta query por usuário; nulo até a primeira sync.
+  deltaLink String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignedDemands Demand[] @relation("DemandAssignee")
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  domains CompanyDomain[]
+  demands Demand[]
+}
+
+// Tabela de roteamento: domínio do remetente → empresa.
+model CompanyDomain {
+  id        String   @id @default(cuid())
+  // Sempre em minúsculas; domínios genéricos (gmail etc.) são bloqueados na escrita.
+  domain    String   @unique
+  companyId String
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// Registro sincronizado do Outlook. Metadados e preview apenas — nunca o corpo.
+model Email {
+  id           String   @id @default(cuid())
+  // Id da mensagem no Graph; único para o upsert idempotente do sync.
+  graphId      String   @unique
+  subject      String
+  preview      String
+  senderEmail  String
+  senderDomain String
+  receivedAt   DateTime
+  // Abrir a mensagem no Outlook; o corpo nunca sai de lá.
+  webLink      String
+  createdAt    DateTime @default(now())
+
+  demand Demand?
+
+  @@index([senderDomain])
+}
+
+enum DemandStatus {
+  aberta
+  em_andamento
+  concluida
+  cancelada
+}
+
+// Unidade de trabalho. Sobrevive ao e-mail que a originou:
+// histórico e indicadores não dependem do que ainda existe no Outlook.
+model Demand {
+  id      String  @id @default(cuid())
+  // Nulo = não classificado; a demanda existe mesmo sem empresa resolvida.
+  companyId String?
+  emailId   String? @unique
+  // Sempre sugestão até classificationConfirmed = true.
+  category  String?
+  // Enquanto falso, fica na fila de revisão e não entra em nenhum indicador.
+  classificationConfirmed Boolean      @default(false)
+  status                  DemandStatus @default(aberta)
+  // Atribuição, nunca fronteira de acesso: todo analista vê toda a carteira.
+  assigneeId String?
+  openedAt   DateTime  @default(now())
+  // Só com status terminal (concluida | cancelada).
+  closedAt  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  company  Company? @relation(fields: [companyId], references: [id])
+  email    Email?   @relation(fields: [emailId], references: [id], onDelete: SetNull)
+  assignee User?    @relation("DemandAssignee", fields: [assigneeId], references: [id])
+
+  @@index([companyId, status])
+  @@index([classificationConfirmed])
+}
+
+// Base da classificação: pattern (substring, case-insensitive) → categoria sugerida.
+model DemandRule {
+  id        String   @id @default(cuid())
+  pattern   String
+  category  String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
