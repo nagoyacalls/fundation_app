@@ -1,9 +1,8 @@
 import NextAuth, { type DefaultSession } from "next-auth";
-import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 
+import { authConfig } from "@/auth.config";
 import { encryptSecret, encryptionKeyFromEnv } from "./crypto";
 import { prisma } from "./db";
-import { GRAPH_SCOPES } from "./graph";
 import { afterLogin } from "./sync-status";
 
 declare module "next-auth" {
@@ -27,14 +26,9 @@ function resolveLoginEmail(
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [
-    MicrosoftEntraID({
-      authorization: { params: { scope: GRAPH_SCOPES } },
-    }),
-  ],
-  session: { strategy: "jwt" },
-  pages: { signIn: "/login" },
+  ...authConfig,
   callbacks: {
+    ...authConfig.callbacks,
     async signIn({ user, account, profile }) {
       const email = resolveLoginEmail(user.email, profile?.preferred_username);
       if (!email) {

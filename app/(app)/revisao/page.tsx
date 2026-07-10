@@ -1,17 +1,11 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { ReviewItem } from "./review-item";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+// Acesso garantido pelo middleware.
 export default async function RevisaoPage() {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
-
   const [demands, companies] = await Promise.all([
     prisma.demand.findMany({
       where: { classificationConfirmed: false },
