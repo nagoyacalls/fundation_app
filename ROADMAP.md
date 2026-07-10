@@ -14,22 +14,21 @@ Estado em 10/07/2026. Uma etapa por vez; cada etapa deixa o sistema funcionando.
 
 ---
 
-## Etapa 5.1 — Correções (agora, antes de qualquer tela nova)
+## Etapa 5.1 — Correções (concluída)
 
 Diagnóstico completo em `REVISAO.md`.
 
-- [ ] **`syncStatus` separado do `refreshToken`.** *(crítico)*
-  `User` ganha `syncStatus` (`pendente | ativo | reauth_required`), `lastSyncAt`, `lastSyncError`.
+- [x] **`syncStatus` separado do `refreshToken`.** *(crítico)*
+  `User` ganhou `syncStatus` (`pendente | ativo | reauth_required`), `lastSyncAt`, `lastSyncError`, com migration que faz backfill.
   `/api/sync` filtra por `syncStatus`, nunca por token nulo. Em `GraphAuthError`, marca `reauth_required` e **mantém** o token.
-  `signIn` grava `ativo` ao receber token novo; força `prompt: "consent"` quando o status for `reauth_required`.
-  Sem isso, a conta que expira nunca volta a sincronizar — e ninguém percebe.
-  Teste obrigatório: expirar → relogar → voltar a sincronizar.
+  `signIn` grava `ativo` ao receber token novo. Transições em `lib/sync-status.ts`, puras e testadas.
+  Ciclo expirar → relogar → voltar a sincronizar coberto em `lib/sync-status.test.ts`.
 
-- [ ] **Banner de reconexão.** No layout: se o usuário logado está em `reauth_required`, faixa com botão de reconectar. Exigido por `docs/sync.md`.
+- [x] **Banner de reconexão.** Layout autenticado (`app/(app)/`) com faixa quando o usuário está em `reauth_required`; botão força `prompt: "consent"`.
 
-- [ ] **`middleware.ts`.** Protege tudo por padrão; libera `/login` e `/api/auth`. Remove as verificações copiadas em cada página.
+- [x] **`middleware.ts`.** Config edge-safe em `auth.config.ts`. Protege tudo por padrão; libera `/login`, `/api/auth` e assets. `/api/sync` segue no `CRON_SECRET`. Verificações removidas das páginas.
 
-- [ ] **`lib/demand.ts`.** Único caminho autorizado a mudar `status` e gravar `closedAt`, validado por `demandSchema`. Hoje a regra existe, está testada, e nada a executa.
+- [x] **`lib/demand.ts`.** Único caminho autorizado a mudar `status` e gravar `closedAt`, validado por `demandSchema`. `nextDemandState` puro e testado nas 16 transições.
 
 ---
 
