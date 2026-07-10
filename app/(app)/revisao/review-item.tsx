@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 
-import { confirmClassification, type ActionResult } from "@/app/revisao/actions";
+import { confirmClassification, type ActionResult } from "./actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
