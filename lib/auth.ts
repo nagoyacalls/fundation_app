@@ -4,6 +4,7 @@ import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 import { encryptSecret, encryptionKeyFromEnv } from "./crypto";
 import { prisma } from "./db";
 import { GRAPH_SCOPES } from "./graph";
+import { afterLogin } from "./sync-status";
 
 declare module "next-auth" {
   interface Session {
@@ -40,24 +41,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return false;
       }
 
-      // Refresh token cifrado; só atualiza quando o Entra manda um novo,
-      // para não apagar um token válido num re-login silencioso.
+      // Token novo cifrado reativa a conta (syncStatus = ativo). Sem token
+      // novo, afterLogin retorna vazio: o status atual é preservado, então
+      // uma conta em reauth_required continua avisando até o consent devolver
+      // um token. Nunca apagamos o token aqui.
       const encryptedRefreshToken = account?.refresh_token
         ? encryptSecret(account.refresh_token, encryptionKeyFromEnv())
-        : undefined;
+        : null;
+      const loginUpdate = afterLogin(encryptedRefreshToken);
 
       await prisma.user.upsert({
         where: { email },
         create: {
           email,
           name: user.name ?? email,
-          refreshToken: encryptedRefreshToken,
+          ...loginUpdate,
         },
         update: {
           name: user.name ?? email,
-          ...(encryptedRefreshToken
-            ? { refreshToken: encryptedRefreshToken }
-            : {}),
+          ...loginUpdate,
         },
       });
       return true;

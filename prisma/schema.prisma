@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Único sinal de que uma conta pode sincronizar. Nunca derive de refreshToken:
+// um token nulo confunde "usuário novo" com "conta expirada" (ver docs/dominio.md).
+enum SyncStatus {
+  pendente
+  ativo
+  reauth_required
+}
+
 // Analista interno. Login via Entra ID; guarda o necessário para o sync do Graph.
 model User {
   id        String   @id @default(cuid())
@@ -16,10 +24,16 @@ model User {
   refreshToken String?
   // Cursor do delta query por usuário; nulo até a primeira sync.
   deltaLink String?
+  // Sinal de sincronização. reauth_required nunca apaga o refreshToken.
+  syncStatus    SyncStatus @default(pendente)
+  lastSyncAt    DateTime?
+  lastSyncError String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   assignedDemands Demand[] @relation("DemandAssignee")
+
+  @@index([syncStatus])
 }
 
 model Company {
