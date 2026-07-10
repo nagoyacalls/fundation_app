@@ -12,17 +12,33 @@ O analista deve identificar imediatamente: **o que exige atenção, o que está 
 
 ## Páginas
 
-- **Home** — cards de empresa com indicadores-resumo (abertas, atrasadas, concluídas no período). Card de **Não classificado** quando houver pendência de revisão.
-- **Empresa** (`/empresas/[id]`) — demandas por status, atrasadas, histórico, responsáveis, gráficos, filtros, busca.
-- **Revisão** — fila de demandas com `classificationConfirmed = false`. Confirma empresa e categoria.
+- **Home** — cards de empresa com indicadores-resumo. Card de **Não classificado** com a contagem da fila de revisão.
+- **Empresa** (`/empresas/[id]`) — demandas por status, prazo, histórico, responsáveis, filtros, busca. É onde o `dueDate` é preenchido e editado.
+- **Revisão** — fila de demandas com `classificationConfirmed = false`. Confirma **empresa e categoria**, e nada mais. Rápida.
 - **Demandas** — lista global com filtro, busca, mudança de status, atribuição.
+
+## Banner de reautenticação
+
+Se o usuário logado está em `syncStatus = reauth_required`, o layout exibe uma faixa persistente com botão de reconectar. Obrigatório — sem ele a conta para de sincronizar em silêncio.
+
+## Estados de prazo
+
+Ver `docs/prazos.md`. Cor é reservada a estado, nunca a decoração.
+
+| Estado | Tratamento |
+|---|---|
+| `sem_prazo` | aviso discreto, campo de data editável na linha |
+| `no_prazo` | sem destaque |
+| `vencendo` | destaque |
+| `atrasada` | destaque forte |
+
+Nunca some `sem_prazo` a `no_prazo`. A lacuna precisa ficar visível.
 
 ## Regras visuais
 
 - Padrões do shadcn/ui. Customize pouco.
-- Uma cor de destaque. Cor é reservada para **estado** (atrasado, urgente), nunca para decoração.
-- Cinzas neutros. Espaçamento base `p-4` / `gap-4`. Muito espaço em branco.
-- Status e prioridade como badges discretos, não blocos saturados.
+- Uma cor de destaque. Cinzas neutros. Espaçamento base `p-4` / `gap-4`. Muito espaço em branco.
+- Status, categoria e prazo como badges discretos, não blocos saturados.
 - Tailwind puro. Sem arquivo CSS próprio.
 - Usável em 1280px.
 
