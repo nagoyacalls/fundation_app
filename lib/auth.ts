@@ -3,15 +3,13 @@ import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 
 import { encryptSecret, encryptionKeyFromEnv } from "./crypto";
 import { prisma } from "./db";
+import { GRAPH_SCOPES } from "./graph";
 
 declare module "next-auth" {
   interface Session {
     user: { id: string } & DefaultSession["user"];
   }
 }
-
-// Escopos de docs/sync.md. Nada além disso — nunca escopo de escrita.
-const GRAPH_SCOPES = "openid profile email offline_access Mail.Read";
 
 /**
  * No Entra o e-mail pode não vir em `email`; `preferred_username` costuma
