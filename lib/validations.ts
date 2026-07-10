@@ -68,6 +68,27 @@ export const TERMINAL_DEMAND_STATUSES: ReadonlySet<DemandStatus> = new Set([
   "cancelada",
 ] as const);
 
+/**
+ * Confirmação na fila de revisão: o analista fixa empresa e categoria.
+ * Empresa vem de exatamente uma fonte — uma existente (companyId) ou uma
+ * nova pelo nome. FormData manda "" para campo vazio; normalizamos antes.
+ */
+export const confirmClassificationSchema = z
+  .object({
+    demandId: requiredText,
+    companyId: requiredText.optional(),
+    newCompanyName: requiredText.optional(),
+    category: requiredText,
+  })
+  .refine(
+    (input) =>
+      (input.companyId === undefined) !== (input.newCompanyName === undefined),
+    {
+      message: "Escolha uma empresa existente ou informe o nome de uma nova",
+      path: ["companyId"],
+    },
+  );
+
 export const demandSchema = z
   .object({
     // Nulos = não classificado; a demanda existe mesmo sem empresa.

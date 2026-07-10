@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   companyDomainSchema,
+  confirmClassificationSchema,
   demandRuleSchema,
   demandSchema,
   emailSchema,
@@ -86,6 +87,58 @@ describe("emailSchema", () => {
     expect(emailSchema.safeParse({ ...valid, webLink: "abrir" }).success).toBe(
       false,
     );
+  });
+});
+
+describe("confirmClassificationSchema", () => {
+  it("aceita confirmação com empresa existente", () => {
+    expect(
+      confirmClassificationSchema.safeParse({
+        demandId: "demand-1",
+        companyId: "company-1",
+        category: "ferias",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("aceita confirmação criando empresa nova", () => {
+    expect(
+      confirmClassificationSchema.safeParse({
+        demandId: "demand-1",
+        newCompanyName: "Acme Contabilidade",
+        category: "ferias",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejeita sem nenhuma fonte de empresa", () => {
+    expect(
+      confirmClassificationSchema.safeParse({
+        demandId: "demand-1",
+        category: "ferias",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejeita com as duas fontes de empresa ao mesmo tempo", () => {
+    expect(
+      confirmClassificationSchema.safeParse({
+        demandId: "demand-1",
+        companyId: "company-1",
+        newCompanyName: "Outra",
+        category: "ferias",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejeita categoria vazia", () => {
+    expect(
+      confirmClassificationSchema.safeParse({
+        demandId: "demand-1",
+        companyId: "company-1",
+        category: "   ",
+      }).success,
+    ).toBe(false);
   });
 });
 
