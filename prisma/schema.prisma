@@ -97,6 +97,9 @@ model Demand {
   status                  DemandStatus @default(aberta)
   // Atribuição, nunca fronteira de acesso: todo analista vê toda a carteira.
   assigneeId String?
+  // Prazo digitado pelo analista no dashboard (docs/prazos.md). Data de
+  // calendário, sem hora. O estado de prazo é derivado, nunca persistido.
+  dueDate    DateTime? @db.Date
   openedAt   DateTime  @default(now())
   // Só com status terminal (concluida | cancelada).
   closedAt  DateTime?
