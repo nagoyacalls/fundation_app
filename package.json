@@ -10,6 +10,9 @@
     "lint": "eslint .",
     "test": "vitest run"
   },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
+  },
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "@radix-ui/react-label": "^2.1.11",

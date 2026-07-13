@@ -32,14 +32,14 @@ Diagnóstico completo em `REVISAO.md`.
 
 ---
 
-## Etapa 5.2 — Prazos
+## Etapa 5.2 — Prazos (concluída)
 
 Depende de: 5.1. Especificação em `docs/prazos.md`.
 
-- [ ] `Demand.dueDate` (`DateTime?`) no schema + migration.
-- [ ] `lib/deadline.ts` — função pura `deadlineState(dueDate, status, now)` → `sem_prazo | no_prazo | vencendo | atrasada`. Status terminal nunca é `vencendo` nem `atrasada`.
-- [ ] Testes: cada estado, fronteira do "vence amanhã", status terminal com prazo vencido, prazo nulo.
-- [ ] Separar `folha_holerite` e `folha_impostos` nas `DemandRule` iniciais.
+- [x] `Demand.dueDate` (`DateTime?`) no schema + migration.
+- [x] `lib/deadline.ts` — função pura `deadlineState(dueDate, status, now)` → `sem_prazo | no_prazo | vencendo | atrasada`. Status terminal nunca é `vencendo` nem `atrasada`.
+- [x] Testes: cada estado, fronteira do "vence amanhã", status terminal com prazo vencido, prazo nulo.
+- [x] Separar `folha_holerite` e `folha_impostos` nas `DemandRule` iniciais.
 
 Nada de tabela de feriados. Nada de cálculo de dia útil. O analista digita o prazo.
 
