@@ -45,6 +45,28 @@ export function nextDemandState(
   return { status: parsed.status, closedAt: parsed.closedAt };
 }
 
+/**
+ * Concluídas no período: status `concluida` com `closedAt` dentro da janela.
+ * Cancelada não é entrega. Indicador derivado de status e closedAt, como
+ * manda o CLAUDE.md; o chamador passa só demandas confirmadas.
+ */
+export function countConcludedSince(
+  demands: ReadonlyArray<{ status: DemandStatus; closedAt: Date | null }>,
+  since: Date,
+): number {
+  let count = 0;
+  for (const demand of demands) {
+    if (
+      demand.status === "concluida" &&
+      demand.closedAt !== null &&
+      demand.closedAt >= since
+    ) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
 export type ChangeStatusResult =
   | { ok: true; data: DemandStatePatch }
   | { ok: false; error: string };

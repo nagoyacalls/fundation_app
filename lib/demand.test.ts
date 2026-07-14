@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { nextDemandState } from "./demand";
+import { countConcludedSince, nextDemandState } from "./demand";
 import type { DemandStatus } from "./validations";
 
 const now = new Date("2026-07-10T12:00:00Z");
@@ -48,6 +48,22 @@ describe("nextDemandState", () => {
     expect(
       nextDemandState(current("concluida", closedBefore), "concluida", now),
     ).toEqual({ status: "concluida", closedAt: closedBefore });
+  });
+
+  it("countConcludedSince: só concluídas com closedAt dentro da janela", () => {
+    const since = new Date("2026-06-15T00:00:00Z");
+    const demands = [
+      { status: "concluida" as const, closedAt: new Date("2026-07-01T10:00:00Z") }, // dentro
+      { status: "concluida" as const, closedAt: since }, // fronteira: dentro
+      { status: "concluida" as const, closedAt: new Date("2026-06-01T10:00:00Z") }, // antiga: fora
+      { status: "cancelada" as const, closedAt: new Date("2026-07-01T10:00:00Z") }, // cancelada não é entrega
+      { status: "aberta" as const, closedAt: null }, // aberta: fora
+    ];
+    expect(countConcludedSince(demands, since)).toBe(2);
+  });
+
+  it("countConcludedSince: zero para carteira vazia", () => {
+    expect(countConcludedSince([], new Date())).toBe(0);
   });
 
   it("nunca produz estado que viole o demandSchema", () => {
