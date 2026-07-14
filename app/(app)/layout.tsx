@@ -21,6 +21,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           >
             Revisão
           </Link>
+          <Link
+            href="/demandas"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Demandas
+          </Link>
         </nav>
       </header>
       {children}

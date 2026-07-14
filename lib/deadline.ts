@@ -6,6 +6,13 @@ import { TERMINAL_DEMAND_STATUSES, type DemandStatus } from "./validations";
 
 export type DeadlineState = "sem_prazo" | "no_prazo" | "vencendo" | "atrasada";
 
+export const DEADLINE_STATES: readonly DeadlineState[] = [
+  "sem_prazo",
+  "no_prazo",
+  "vencendo",
+  "atrasada",
+];
+
 // "Hoje" é o dia corrente dos analistas, não o do servidor: um deploy em UTC
 // marcaria atraso às 21h de Brasília. Fixo, para o resultado não depender do
 // fuso da máquina.
