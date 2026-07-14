@@ -56,11 +56,19 @@ export async function confirmClassification(
       (await tx.company.create({ data: { name: input.newCompanyName as string } }))
         .id;
 
+    // input.category já vem normalizado pelo schema; o nome único da tabela
+    // garante que grafias divergentes caem na MESMA categoria.
+    const category = await tx.category.upsert({
+      where: { name: input.category },
+      create: { name: input.category },
+      update: {},
+    });
+
     await tx.demand.update({
       where: { id: demand.id },
       data: {
         companyId,
-        category: input.category,
+        categoryId: category.id,
         classificationConfirmed: true,
       },
     });

@@ -9,7 +9,7 @@ function rule(overrides: Partial<ClassificationRule>): ClassificationRule {
   return {
     id: "rule-1",
     pattern: "férias",
-    category: "ferias",
+    categoryId: "cat-ferias",
     active: true,
     createdAt: new Date("2026-01-01T00:00:00Z"),
     ...overrides,
@@ -22,15 +22,15 @@ describe("suggestCategory", () => {
       { subject: "Solicitação de férias", preview: "Segue o pedido." },
       [rule({})],
     );
-    expect(result).toEqual({ category: "ferias", matchedRuleIds: ["rule-1"] });
+    expect(result).toEqual({ categoryId: "cat-ferias", matchedRuleIds: ["rule-1"] });
   });
 
   it("casa também no preview, não só no assunto", () => {
     const result = suggestCategory(
       { subject: "Urgente", preview: "Precisamos falar sobre a rescisão do João." },
-      [rule({ id: "rule-resc", pattern: "rescisão", category: "rescisao" })],
+      [rule({ id: "rule-resc", pattern: "rescisão", categoryId: "cat-rescisao" })],
     );
-    expect(result.category).toBe("rescisao");
+    expect(result.categoryId).toBe("cat-rescisao");
   });
 
   it("é case-insensitive dos dois lados", () => {
@@ -38,7 +38,7 @@ describe("suggestCategory", () => {
       { subject: "SOLICITAÇÃO DE FÉRIAS", preview: "" },
       [rule({ pattern: "Férias" })],
     );
-    expect(result.category).toBe("ferias");
+    expect(result.categoryId).toBe("cat-ferias");
   });
 
   it("retorna sem categoria quando nenhuma regra casa", () => {
@@ -46,7 +46,7 @@ describe("suggestCategory", () => {
       { subject: "Nota fiscal de serviço", preview: "Segue anexo." },
       [rule({})],
     );
-    expect(result).toEqual({ category: null, matchedRuleIds: [] });
+    expect(result).toEqual({ categoryId: null, matchedRuleIds: [] });
   });
 
   it("retorna sem categoria quando não há regras", () => {
@@ -54,7 +54,7 @@ describe("suggestCategory", () => {
       { subject: "Solicitação de férias", preview: "" },
       [],
     );
-    expect(result).toEqual({ category: null, matchedRuleIds: [] });
+    expect(result).toEqual({ categoryId: null, matchedRuleIds: [] });
   });
 
   it("com múltiplas regras casando, sugere a criada primeiro e lista todas", () => {
@@ -62,13 +62,13 @@ describe("suggestCategory", () => {
       rule({
         id: "rule-nova",
         pattern: "férias",
-        category: "ferias-vendidas",
+        categoryId: "cat-ferias-vendidas",
         createdAt: new Date("2026-03-01T00:00:00Z"),
       }),
       rule({
         id: "rule-antiga",
         pattern: "solicitação",
-        category: "solicitacao-geral",
+        categoryId: "cat-solicitacao-geral",
         createdAt: new Date("2026-01-01T00:00:00Z"),
       }),
     ];
@@ -76,21 +76,21 @@ describe("suggestCategory", () => {
       { subject: "Solicitação de férias", preview: "" },
       rules,
     );
-    expect(result.category).toBe("solicitacao-geral");
+    expect(result.categoryId).toBe("cat-solicitacao-geral");
     expect(result.matchedRuleIds).toEqual(["rule-antiga", "rule-nova"]);
   });
 
   it("desempata regras criadas no mesmo instante pelo id", () => {
     const createdAt = new Date("2026-01-01T00:00:00Z");
     const rules = [
-      rule({ id: "rule-b", pattern: "férias", category: "categoria-b", createdAt }),
-      rule({ id: "rule-a", pattern: "férias", category: "categoria-a", createdAt }),
+      rule({ id: "rule-b", pattern: "férias", categoryId: "cat-b", createdAt }),
+      rule({ id: "rule-a", pattern: "férias", categoryId: "cat-a", createdAt }),
     ];
     const result = suggestCategory(
       { subject: "Férias", preview: "" },
       rules,
     );
-    expect(result.category).toBe("categoria-a");
+    expect(result.categoryId).toBe("cat-a");
   });
 
   it("ignora regras inativas", () => {
@@ -98,7 +98,7 @@ describe("suggestCategory", () => {
       { subject: "Solicitação de férias", preview: "" },
       [rule({ active: false })],
     );
-    expect(result).toEqual({ category: null, matchedRuleIds: [] });
+    expect(result).toEqual({ categoryId: null, matchedRuleIds: [] });
   });
 
   it("ignora pattern vazio ou só espaços em vez de casar tudo", () => {
@@ -106,6 +106,6 @@ describe("suggestCategory", () => {
       { subject: "Qualquer assunto", preview: "Qualquer preview" },
       [rule({ pattern: "   " })],
     );
-    expect(result).toEqual({ category: null, matchedRuleIds: [] });
+    expect(result).toEqual({ categoryId: null, matchedRuleIds: [] });
   });
 });

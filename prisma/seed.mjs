@@ -16,11 +16,18 @@ const prisma = new PrismaClient();
 
 // Idempotente: rodar de novo não duplica nem sobrescreve ajuste do analista.
 for (const rule of INITIAL_RULES) {
+  const category = await prisma.category.upsert({
+    where: { name: rule.category },
+    create: { name: rule.category },
+    update: {},
+  });
   const existing = await prisma.demandRule.findFirst({
-    where: { pattern: rule.pattern, category: rule.category },
+    where: { pattern: rule.pattern, categoryId: category.id },
   });
   if (!existing) {
-    await prisma.demandRule.create({ data: rule });
+    await prisma.demandRule.create({
+      data: { pattern: rule.pattern, categoryId: category.id },
+    });
     console.log(`criada: "${rule.pattern}" → ${rule.category}`);
   } else {
     console.log(`já existe: "${rule.pattern}" → ${rule.category}`);

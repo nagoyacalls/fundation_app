@@ -21,7 +21,7 @@ const rules: ClassificationRule[] = [
   {
     id: "rule-ferias",
     pattern: "férias",
-    category: "ferias",
+    categoryId: "cat-ferias",
     active: true,
     createdAt: new Date("2026-01-01T00:00:00Z"),
   },
@@ -104,7 +104,7 @@ describe("buildDemand", () => {
     const input = toEmailInput(graphMessage());
     expect(buildDemand(input!, routes, rules)).toEqual({
       companyId: "company-acme",
-      category: "ferias",
+      categoryId: "cat-ferias",
       classificationConfirmed: false,
     });
   });
@@ -119,7 +119,7 @@ describe("buildDemand", () => {
     );
     expect(buildDemand(input!, routes, rules)).toEqual({
       companyId: null,
-      category: null,
+      categoryId: null,
       classificationConfirmed: false,
     });
   });
@@ -132,7 +132,7 @@ describe("ingestMessages", () => {
     expect(counts).toEqual({ created: 1, skipped: 0 });
     expect(demands.get("email-msg-1")).toMatchObject({
       companyId: "company-acme",
-      category: "ferias",
+      categoryId: "cat-ferias",
       classificationConfirmed: false,
     });
   });

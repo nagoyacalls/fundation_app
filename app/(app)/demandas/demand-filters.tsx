@@ -29,7 +29,7 @@ export function DemandFilters({
   /** Ausente na página da empresa: o escopo já é uma empresa só. */
   companies?: Array<{ id: string; name: string }>;
   users: Array<{ id: string; name: string }>;
-  categories: string[];
+  categories: Array<{ id: string; name: string }>;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -97,8 +97,8 @@ export function DemandFilters({
       >
         <option value="">Categoria: todas</option>
         {categories.map((category) => (
-          <option key={category} value={category}>
-            {category}
+          <option key={category.id} value={category.id}>
+            {category.name}
           </option>
         ))}
       </select>

@@ -41,7 +41,7 @@ export default async function DemandasPage({
     classificationConfirmed: true,
     ...(empresa ? { companyId: empresa } : {}),
     ...(status ? { status } : {}),
-    ...(categoria ? { category: categoria } : {}),
+    ...(categoria ? { categoryId: categoria } : {}),
     ...(resp ? { assigneeId: resp === "sem" ? null : resp } : {}),
     ...(q
       ? {
@@ -55,22 +55,23 @@ export default async function DemandasPage({
       : {}),
   };
 
-  const [demands, companies, users, categoryRows] = await Promise.all([
+  const [demands, companies, users, categories] = await Promise.all([
     prisma.demand.findMany({
       where,
       include: {
         email: { select: { subject: true, senderEmail: true, webLink: true } },
         company: { select: { name: true } },
+        category: { select: { name: true } },
       },
       orderBy: { openedAt: "desc" },
     }),
     prisma.company.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     prisma.user.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    prisma.demand.findMany({
-      where: { classificationConfirmed: true, category: { not: null } },
-      distinct: ["category"],
-      select: { category: true },
-      orderBy: { category: "asc" },
+    // Só categorias em uso por demandas confirmadas: filtro sem opção morta.
+    prisma.category.findMany({
+      where: { demands: { some: { classificationConfirmed: true } } },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
     }),
   ]);
 
@@ -80,10 +81,6 @@ export default async function DemandasPage({
   const rows = demands
     .map((demand) => ({ demand, deadline: deadlineState(demand.dueDate, demand.status, now) }))
     .filter((row) => prazo === null || row.deadline === prazo);
-
-  const categories = categoryRows
-    .map((row) => row.category)
-    .filter((category): category is string => category !== null);
 
   const hasFilters = Boolean(q || empresa || categoria || resp || status || prazo);
 
@@ -127,7 +124,7 @@ export default async function DemandasPage({
                 webLink: demand.email?.webLink ?? null,
                 companyId: demand.companyId,
                 companyName: demand.company?.name ?? null,
-                category: demand.category,
+                category: demand.category?.name ?? null,
                 status: demand.status,
                 assigneeId: demand.assigneeId,
                 dueDate: demand.dueDate?.toISOString().slice(0, 10) ?? null,

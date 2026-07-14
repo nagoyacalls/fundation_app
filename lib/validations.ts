@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 
+import { normalizeCategoryName } from "./category";
 import { isGenericDomain, normalizeDomain } from "./routing";
 
 const requiredText = z.string().trim().min(1, "Obrigatório");
@@ -36,7 +37,8 @@ export const companyDomainSchema = z.object({
 
 export const demandRuleSchema = z.object({
   pattern: requiredText,
-  category: requiredText,
+  // Nome digitado; normalizado aqui, resolvido para Category na escrita.
+  category: requiredText.transform(normalizeCategoryName).pipe(z.string().min(1)),
   active: z.boolean().default(true),
 });
 
@@ -78,7 +80,9 @@ export const confirmClassificationSchema = z
     demandId: requiredText,
     companyId: requiredText.optional(),
     newCompanyName: requiredText.optional(),
-    category: requiredText,
+    // Digitação livre continua (revisão é rápida); a normalização + tabela
+    // Category garantem que "Férias" e "ferias" são a mesma categoria.
+    category: requiredText.transform(normalizeCategoryName).pipe(z.string().min(1)),
   })
   .refine(
     (input) =>
@@ -131,7 +135,7 @@ export const demandSchema = z
     // Nulos = não classificado; a demanda existe mesmo sem empresa.
     companyId: requiredText.nullable().default(null),
     emailId: requiredText.nullable().default(null),
-    category: requiredText.nullable().default(null),
+    categoryId: requiredText.nullable().default(null),
     classificationConfirmed: z.boolean().default(false),
     status: demandStatusSchema.default("aberta"),
     assigneeId: requiredText.nullable().default(null),

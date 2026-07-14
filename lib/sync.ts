@@ -21,7 +21,7 @@ export interface EmailInput {
 
 export interface DemandInput {
   companyId: string | null;
-  category: string | null;
+  categoryId: string | null;
   classificationConfirmed: false;
 }
 
@@ -66,7 +66,7 @@ export function buildDemand(
   );
   return {
     companyId: routing.companyId,
-    category: suggestion.category,
+    categoryId: suggestion.categoryId,
     // Sempre sugestão: só o analista tira a demanda da fila de revisão.
     classificationConfirmed: false,
   };

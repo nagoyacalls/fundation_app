@@ -91,7 +91,7 @@ model Demand {
   companyId String?
   emailId   String? @unique
   // Sempre sugestão até classificationConfirmed = true.
-  category  String?
+  categoryId String?
   // Enquanto falso, fica na fila de revisão e não entra em nenhum indicador.
   classificationConfirmed Boolean      @default(false)
   status                  DemandStatus @default(aberta)
@@ -106,20 +106,34 @@ model Demand {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  company  Company? @relation(fields: [companyId], references: [id])
-  email    Email?   @relation(fields: [emailId], references: [id], onDelete: SetNull)
-  assignee User?    @relation("DemandAssignee", fields: [assigneeId], references: [id])
+  company  Company?  @relation(fields: [companyId], references: [id])
+  email    Email?    @relation(fields: [emailId], references: [id], onDelete: SetNull)
+  assignee User?     @relation("DemandAssignee", fields: [assigneeId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
 
   @@index([companyId, status])
   @@index([classificationConfirmed])
 }
 
+// Categoria promovida a tabela (docs/dominio.md): name é o slug canônico
+// (lib/category.ts), único — grafias divergentes não viram categorias novas.
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  demands Demand[]
+  rules   DemandRule[]
+}
+
 // Base da classificação: pattern (substring, case-insensitive) → categoria sugerida.
 model DemandRule {
-  id        String   @id @default(cuid())
-  pattern   String
-  category  String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  pattern    String
+  categoryId String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id])
 }

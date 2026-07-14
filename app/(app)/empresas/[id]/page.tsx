@@ -57,7 +57,7 @@ export default async function EmpresaPage({
     // Palpite não entra em indicador nem na carteira (CLAUDE.md).
     classificationConfirmed: true,
     ...(status ? { status } : {}),
-    ...(categoria ? { category: categoria } : {}),
+    ...(categoria ? { categoryId: categoria } : {}),
     ...(resp ? { assigneeId: resp === "sem" ? null : resp } : {}),
     ...(q
       ? {
@@ -71,11 +71,12 @@ export default async function EmpresaPage({
       : {}),
   };
 
-  const [demands, allConfirmed, users, categoryRows] = await Promise.all([
+  const [demands, allConfirmed, users, categories] = await Promise.all([
     prisma.demand.findMany({
       where,
       include: {
         email: { select: { subject: true, senderEmail: true, webLink: true } },
+        category: { select: { name: true } },
       },
       orderBy: { openedAt: "desc" },
     }),
@@ -85,11 +86,10 @@ export default async function EmpresaPage({
       select: { dueDate: true, status: true },
     }),
     prisma.user.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    prisma.demand.findMany({
-      where: { companyId: id, classificationConfirmed: true, category: { not: null } },
-      distinct: ["category"],
-      select: { category: true },
-      orderBy: { category: "asc" },
+    prisma.category.findMany({
+      where: { demands: { some: { companyId: id, classificationConfirmed: true } } },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
     }),
   ]);
 
@@ -99,9 +99,6 @@ export default async function EmpresaPage({
     .map((demand) => ({ demand, deadline: deadlineState(demand.dueDate, demand.status, now) }))
     .filter((row) => prazo === null || row.deadline === prazo);
 
-  const categories = categoryRows
-    .map((row) => row.category)
-    .filter((category): category is string => category !== null);
   const hasFilters = Boolean(q || categoria || resp || status || prazo);
 
   const counters = [
@@ -174,7 +171,7 @@ export default async function EmpresaPage({
                 webLink: demand.email?.webLink ?? null,
                 companyId: null,
                 companyName: null,
-                category: demand.category,
+                category: demand.category?.name ?? null,
                 status: demand.status,
                 assigneeId: demand.assigneeId,
                 dueDate: demand.dueDate?.toISOString().slice(0, 10) ?? null,

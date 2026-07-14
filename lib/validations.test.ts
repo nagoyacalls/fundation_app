@@ -210,7 +210,7 @@ describe("demandSchema", () => {
     const result = demandSchema.parse({});
     expect(result).toMatchObject({
       companyId: null,
-      category: null,
+      categoryId: null,
       classificationConfirmed: false,
       status: "aberta",
       closedAt: null,

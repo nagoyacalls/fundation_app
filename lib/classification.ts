@@ -5,7 +5,7 @@
 export interface ClassificationRule {
   id: string;
   pattern: string;
-  category: string;
+  categoryId: string;
   active: boolean;
   createdAt: Date;
 }
@@ -17,7 +17,7 @@ export interface ClassificationInput {
 
 export interface ClassificationSuggestion {
   /** Nulo quando nenhuma regra casa; a demanda vai para revisão sem categoria. */
-  category: string | null;
+  categoryId: string | null;
   /** Ids de todas as regras que casaram, na ordem avaliada — insumo da revisão. */
   matchedRuleIds: string[];
 }
@@ -57,7 +57,7 @@ export function suggestCategory(
   }
 
   return {
-    category: firstMatch ? firstMatch.category : null,
+    categoryId: firstMatch ? firstMatch.categoryId : null,
     matchedRuleIds,
   };
 }

@@ -21,6 +21,7 @@ export default async function RevisaoPage() {
           },
         },
         company: { select: { name: true } },
+        category: { select: { name: true } },
       },
       orderBy: { openedAt: "asc" },
     }),
@@ -57,7 +58,7 @@ export default async function RevisaoPage() {
               key={demand.id}
               demand={{
                 id: demand.id,
-                category: demand.category,
+                category: demand.category?.name ?? null,
                 companyId: demand.companyId,
                 companyName: demand.company?.name ?? null,
                 subject: demand.email?.subject ?? "(sem assunto)",
