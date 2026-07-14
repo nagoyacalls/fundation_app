@@ -82,6 +82,14 @@ export function deadlineState(
 }
 
 /**
+ * Entregue no prazo: o dia da conclusão (no fuso do negócio) não passou do
+ * dia do vencimento. Comparação por dia de calendário — prazo não tem hora.
+ */
+export function concludedOnTime(dueDate: Date, closedAt: Date): boolean {
+  return businessDayNumber(closedAt) <= dueDayNumber(dueDate);
+}
+
+/**
  * Contadores de painel. Status terminal fica fora de TODAS as contagens —
  * o prazo deixou de correr — e sem_prazo é contado à parte, nunca somado.
  * O chamador passa apenas demandas confirmadas: palpite não entra em
