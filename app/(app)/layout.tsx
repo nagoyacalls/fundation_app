@@ -31,6 +31,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           >
             Demandas
           </Link>
+          <Link
+            href="/analitica"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Analítica
+          </Link>
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden text-xs text-muted-foreground sm:inline">
               {session?.user?.email}
