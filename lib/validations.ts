@@ -89,6 +89,43 @@ export const confirmClassificationSchema = z
     },
   );
 
+// Ações da lista de demandas. A mudança de status valida aqui a ENTRADA;
+// o invariante status/closedAt é do lib/demand.ts, único caminho de escrita.
+export const changeDemandStatusSchema = z.object({
+  demandId: requiredText,
+  status: demandStatusSchema,
+});
+
+export const assignDemandSchema = z.object({
+  demandId: requiredText,
+  // "" = remover a atribuição. Atribuição, nunca fronteira de acesso.
+  assigneeId: z
+    .string()
+    .trim()
+    .transform((value) => (value === "" ? null : value)),
+});
+
+export const setDueDateSchema = z.object({
+  demandId: requiredText,
+  // <input type="date"> manda "YYYY-MM-DD", ou "" para limpar o prazo.
+  // Guarda como data pura em meia-noite UTC, casando com @db.Date.
+  dueDate: z.string().trim().transform((value, ctx) => {
+    if (value === "") {
+      return null;
+    }
+    const date = new Date(`${value}T00:00:00Z`);
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
+      Number.isNaN(date.getTime()) ||
+      date.toISOString().slice(0, 10) !== value
+    ) {
+      ctx.addIssue({ code: "custom", message: "Data inválida" });
+      return z.NEVER;
+    }
+    return date;
+  }),
+});
+
 export const demandSchema = z
   .object({
     // Nulos = não classificado; a demanda existe mesmo sem empresa.

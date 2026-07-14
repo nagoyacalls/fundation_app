@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  assignDemandSchema,
+  changeDemandStatusSchema,
   companyDomainSchema,
   confirmClassificationSchema,
   demandRuleSchema,
   demandSchema,
   emailSchema,
+  setDueDateSchema,
 } from "./validations";
 
 describe("companyDomainSchema", () => {
@@ -138,6 +141,66 @@ describe("confirmClassificationSchema", () => {
         companyId: "company-1",
         category: "   ",
       }).success,
+    ).toBe(false);
+  });
+});
+
+describe("changeDemandStatusSchema", () => {
+  it("aceita status válido", () => {
+    expect(
+      changeDemandStatusSchema.safeParse({ demandId: "d1", status: "concluida" })
+        .success,
+    ).toBe(true);
+  });
+
+  it("rejeita status fora do ciclo", () => {
+    expect(
+      changeDemandStatusSchema.safeParse({ demandId: "d1", status: "pausada" })
+        .success,
+    ).toBe(false);
+  });
+});
+
+describe("assignDemandSchema", () => {
+  it("aceita atribuição a um analista", () => {
+    const result = assignDemandSchema.parse({
+      demandId: "d1",
+      assigneeId: "user-1",
+    });
+    expect(result.assigneeId).toBe("user-1");
+  });
+
+  it("string vazia remove a atribuição (vira null)", () => {
+    const result = assignDemandSchema.parse({ demandId: "d1", assigneeId: "" });
+    expect(result.assigneeId).toBeNull();
+  });
+});
+
+describe("setDueDateSchema", () => {
+  it("converte YYYY-MM-DD em data pura à meia-noite UTC", () => {
+    const result = setDueDateSchema.parse({
+      demandId: "d1",
+      dueDate: "2026-07-20",
+    });
+    expect(result.dueDate).toEqual(new Date("2026-07-20T00:00:00Z"));
+  });
+
+  it("string vazia limpa o prazo (vira null)", () => {
+    const result = setDueDateSchema.parse({ demandId: "d1", dueDate: "" });
+    expect(result.dueDate).toBeNull();
+  });
+
+  it("rejeita formato inválido", () => {
+    expect(
+      setDueDateSchema.safeParse({ demandId: "d1", dueDate: "20/07/2026" })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejeita data inexistente no calendário", () => {
+    expect(
+      setDueDateSchema.safeParse({ demandId: "d1", dueDate: "2026-02-31" })
+        .success,
     ).toBe(false);
   });
 });
