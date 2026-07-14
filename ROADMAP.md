@@ -45,17 +45,17 @@ Nada de tabela de feriados. Nada de cálculo de dia útil. O analista digita o p
 
 ---
 
-## Etapa 6 — Lista de demandas
+## Etapa 6 — Lista de demandas (concluída)
 
 Depende de: 5.2.
 
-- [ ] `/demandas` — lista global de demandas confirmadas.
-- [ ] Filtros: empresa, status, categoria, prazo, responsável.
-- [ ] Busca por assunto e remetente.
-- [ ] Mudança de status via Server Action, passando por `lib/demand.ts`.
-- [ ] Atribuição de responsável.
-- [ ] Edição de `dueDate` na linha, com aviso quando ausente.
-- [ ] Empty state, skeleton, erro inline.
+- [x] `/demandas` — lista global de demandas confirmadas.
+- [x] Filtros: empresa, status, categoria, prazo, responsável.
+- [x] Busca por assunto e remetente.
+- [x] Mudança de status via Server Action, passando por `lib/demand.ts`.
+- [x] Atribuição de responsável.
+- [x] Edição de `dueDate` na linha, com aviso quando ausente.
+- [x] Empty state, skeleton, erro inline.
 
 ---
 
