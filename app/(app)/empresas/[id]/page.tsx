@@ -1,15 +1,21 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
-import { DemandFilters } from "./demand-filters";
-import { DemandRow } from "./demand-row";
+import { DemandFilters } from "../../demandas/demand-filters";
+import { DemandRow } from "../../demandas/demand-row";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
-import { deadlineState, DEADLINE_STATES, type DeadlineState } from "@/lib/deadline";
+import {
+  deadlineCounts,
+  deadlineState,
+  DEADLINE_STATES,
+  type DeadlineState,
+} from "@/lib/deadline";
 import { demandStatusSchema, type DemandStatus } from "@/lib/validations";
 import type { Prisma } from "@prisma/client";
 
-// Acesso garantido pelo middleware. Filtros vivem na URL: compartilháveis,
-// sem estado global, e o Server Component refaz a busca a cada mudança.
+// Dashboard da empresa: a tela principal de preenchimento de dueDate
+// (docs/prazos.md). Acesso garantido pelo middleware.
 
 interface SearchParams {
   [key: string]: string | string[] | undefined;
@@ -19,27 +25,37 @@ function single(value: string | string[] | undefined): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export default async function DemandasPage({
+export default async function EmpresaPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ id: string }>;
   searchParams: Promise<SearchParams>;
 }) {
-  const params = await searchParams;
-  const q = single(params.q);
-  const empresa = single(params.empresa);
-  const categoria = single(params.categoria);
-  const resp = single(params.resp);
-  const statusParsed = demandStatusSchema.safeParse(single(params.status));
+  const { id } = await params;
+  const company = await prisma.company.findUnique({
+    where: { id },
+    include: { domains: { orderBy: { domain: "asc" } } },
+  });
+  if (!company) {
+    notFound();
+  }
+
+  const sp = await searchParams;
+  const q = single(sp.q);
+  const categoria = single(sp.categoria);
+  const resp = single(sp.resp);
+  const statusParsed = demandStatusSchema.safeParse(single(sp.status));
   const status: DemandStatus | null = statusParsed.success ? statusParsed.data : null;
-  const prazoRaw = single(params.prazo);
+  const prazoRaw = single(sp.prazo);
   const prazo: DeadlineState | null = (DEADLINE_STATES as readonly string[]).includes(prazoRaw)
     ? (prazoRaw as DeadlineState)
     : null;
 
   const where: Prisma.DemandWhereInput = {
-    // Só demandas confirmadas: palpite não aparece na carteira (CLAUDE.md).
+    companyId: id,
+    // Palpite não entra em indicador nem na carteira (CLAUDE.md).
     classificationConfirmed: true,
-    ...(empresa ? { companyId: empresa } : {}),
     ...(status ? { status } : {}),
     ...(categoria ? { category: categoria } : {}),
     ...(resp ? { assigneeId: resp === "sem" ? null : resp } : {}),
@@ -55,28 +71,30 @@ export default async function DemandasPage({
       : {}),
   };
 
-  const [demands, companies, users, categoryRows] = await Promise.all([
+  const [demands, allConfirmed, users, categoryRows] = await Promise.all([
     prisma.demand.findMany({
       where,
       include: {
         email: { select: { subject: true, senderEmail: true, webLink: true } },
-        company: { select: { name: true } },
       },
       orderBy: { openedAt: "desc" },
     }),
-    prisma.company.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    // Contadores sempre sobre a carteira inteira da empresa, não o filtro.
+    prisma.demand.findMany({
+      where: { companyId: id, classificationConfirmed: true },
+      select: { dueDate: true, status: true },
+    }),
     prisma.user.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     prisma.demand.findMany({
-      where: { classificationConfirmed: true, category: { not: null } },
+      where: { companyId: id, classificationConfirmed: true, category: { not: null } },
       distinct: ["category"],
       select: { category: true },
       orderBy: { category: "asc" },
     }),
   ]);
 
-  // Estado de prazo é derivado (lib/deadline.ts) — o filtro aplica a mesma
-  // função da exibição, nunca uma cópia da regra em SQL.
   const now = new Date();
+  const counts = deadlineCounts(allConfirmed, now);
   const rows = demands
     .map((demand) => ({ demand, deadline: deadlineState(demand.dueDate, demand.status, now) }))
     .filter((row) => prazo === null || row.deadline === prazo);
@@ -84,32 +102,61 @@ export default async function DemandasPage({
   const categories = categoryRows
     .map((row) => row.category)
     .filter((category): category is string => category !== null);
+  const hasFilters = Boolean(q || categoria || resp || status || prazo);
 
-  const hasFilters = Boolean(q || empresa || categoria || resp || status || prazo);
+  const counters = [
+    { label: "Em aberto", value: counts.emAberto, alert: false },
+    { label: "Vencendo", value: counts.vencendo, alert: false },
+    { label: "Atrasadas", value: counts.atrasada, alert: counts.atrasada > 0 },
+    { label: "Sem prazo", value: counts.semPrazo, alert: false },
+  ];
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-lg font-semibold">Demandas</h1>
-        <p className="text-sm text-muted-foreground">
-          {rows.length === 0
-            ? "Nenhum resultado"
-            : `${rows.length} demanda${rows.length > 1 ? "s" : ""}`}
-        </p>
+      <div className="flex items-baseline justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-semibold">{company.name}</h1>
+          <p className="truncate text-sm text-muted-foreground">
+            {company.domains.length > 0
+              ? company.domains.map((route) => route.domain).join(" · ")
+              : "nenhum domínio roteado"}
+          </p>
+        </div>
+        <Link
+          href="/demandas"
+          className="shrink-0 text-sm text-muted-foreground hover:text-foreground"
+        >
+          Todas as demandas
+        </Link>
       </div>
 
-      <DemandFilters companies={companies} users={users} categories={categories} />
+      <dl className="grid grid-cols-4 gap-4">
+        {counters.map((counter) => (
+          <div key={counter.label} className="rounded-md border p-4">
+            <dt className="text-xs text-muted-foreground">{counter.label}</dt>
+            <dd
+              className={`text-2xl font-semibold tabular-nums ${
+                counter.alert ? "text-destructive" : ""
+              }`}
+            >
+              {counter.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <DemandFilters users={users} categories={categories} />
 
       {rows.length === 0 ? (
         <div className="flex flex-col items-center gap-4 rounded-md border border-dashed p-8 text-center">
           <p className="text-sm text-muted-foreground">
             {hasFilters
               ? "Nenhuma demanda com esses filtros."
-              : "Nenhuma demanda confirmada ainda."}
+              : "Nenhuma demanda confirmada para esta empresa."}
           </p>
           <Button asChild variant="outline" size="sm">
             {hasFilters ? (
-              <Link href="/demandas">Limpar filtros</Link>
+              <Link href={`/empresas/${company.id}`}>Limpar filtros</Link>
             ) : (
               <Link href="/revisao">Ir para a Revisão</Link>
             )}
@@ -125,8 +172,8 @@ export default async function DemandasPage({
                 subject: demand.email?.subject ?? "(sem assunto)",
                 senderEmail: demand.email?.senderEmail ?? "",
                 webLink: demand.email?.webLink ?? null,
-                companyId: demand.companyId,
-                companyName: demand.company?.name ?? null,
+                companyId: null,
+                companyName: null,
                 category: demand.category,
                 status: demand.status,
                 assigneeId: demand.assigneeId,

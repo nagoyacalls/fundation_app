@@ -13,6 +13,13 @@ import {
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
+// A linha de demanda aparece na lista global e na página da empresa;
+// as duas precisam refletir a escrita.
+function revalidateDemandViews() {
+  revalidatePath("/demandas");
+  revalidatePath("/empresas/[id]", "page");
+}
+
 async function requireSession(): Promise<ActionResult | null> {
   const session = await auth();
   return session?.user ? null : { ok: false, error: "Sessão expirada. Entre novamente." };
@@ -40,7 +47,7 @@ export async function updateDemandStatus(
   if (!result.ok) {
     return result;
   }
-  revalidatePath("/demandas");
+  revalidateDemandViews();
   return { ok: true };
 }
 
@@ -69,7 +76,7 @@ export async function assignDemand(
   } catch {
     return { ok: false, error: "Demanda ou analista não encontrado" };
   }
-  revalidatePath("/demandas");
+  revalidateDemandViews();
   return { ok: true };
 }
 
@@ -98,6 +105,6 @@ export async function setDueDate(
   } catch {
     return { ok: false, error: "Demanda não encontrada" };
   }
-  revalidatePath("/demandas");
+  revalidateDemandViews();
   return { ok: true };
 }

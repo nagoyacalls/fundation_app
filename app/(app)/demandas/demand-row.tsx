@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 
 import {
@@ -28,6 +29,7 @@ export interface DemandRowData {
   subject: string;
   senderEmail: string;
   webLink: string | null;
+  companyId: string | null;
   companyName: string | null;
   category: string | null;
   status: DemandStatus;
@@ -84,8 +86,12 @@ export function DemandRow({
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          {demand.companyName ? (
-            <Badge variant="secondary">{demand.companyName}</Badge>
+          {demand.companyName && demand.companyId ? (
+            <Badge variant="secondary" asChild>
+              <Link href={`/empresas/${demand.companyId}`}>
+                {demand.companyName}
+              </Link>
+            </Badge>
           ) : null}
           {demand.category ? (
             <Badge variant="outline">{demand.category}</Badge>

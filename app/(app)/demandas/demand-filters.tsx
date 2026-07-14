@@ -26,7 +26,8 @@ export function DemandFilters({
   users,
   categories,
 }: {
-  companies: Array<{ id: string; name: string }>;
+  /** Ausente na página da empresa: o escopo já é uma empresa só. */
+  companies?: Array<{ id: string; name: string }>;
   users: Array<{ id: string; name: string }>;
   categories: string[];
 }) {
@@ -60,19 +61,21 @@ export function DemandFilters({
         className="h-9 w-64"
         aria-label="Buscar por assunto ou remetente"
       />
-      <select
-        aria-label="Filtrar por empresa"
-        className={selectClass}
-        value={searchParams.get("empresa") ?? ""}
-        onChange={(event) => setParam("empresa", event.target.value)}
-      >
-        <option value="">Empresa: todas</option>
-        {companies.map((company) => (
-          <option key={company.id} value={company.id}>
-            {company.name}
-          </option>
-        ))}
-      </select>
+      {companies ? (
+        <select
+          aria-label="Filtrar por empresa"
+          className={selectClass}
+          value={searchParams.get("empresa") ?? ""}
+          onChange={(event) => setParam("empresa", event.target.value)}
+        >
+          <option value="">Empresa: todas</option>
+          {companies.map((company) => (
+            <option key={company.id} value={company.id}>
+              {company.name}
+            </option>
+          ))}
+        </select>
+      ) : null}
       <select
         aria-label="Filtrar por status"
         className={selectClass}
