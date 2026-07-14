@@ -59,14 +59,14 @@ Depende de: 5.2.
 
 ---
 
-## Etapa 7 — Página da empresa
+## Etapa 7 — Página da empresa (concluída)
 
 Depende de: 6.
 
-- [ ] `/empresas/[id]` — demandas por status e por prazo, histórico, responsáveis.
-- [ ] Filtros e busca no escopo da empresa.
-- [ ] Contagem de atrasadas e de vencendo. Ignora `sem_prazo` e status terminal.
-- [ ] É a tela principal de preenchimento de `dueDate`.
+- [x] `/empresas/[id]` — demandas por status e por prazo, histórico, responsáveis.
+- [x] Filtros e busca no escopo da empresa.
+- [x] Contagem de atrasadas e de vencendo. Ignora `sem_prazo` e status terminal.
+- [x] É a tela principal de preenchimento de `dueDate`.
 
 ---
 
