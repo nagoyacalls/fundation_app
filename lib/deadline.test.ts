@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { deadlineState } from "./deadline";
+import { deadlineCounts, deadlineState } from "./deadline";
 
 // Meio-dia em Brasília (15:00Z): dia corrente = 2026-07-10 nos dois fusos.
 const now = new Date("2026-07-10T15:00:00Z");
@@ -49,6 +49,39 @@ describe("deadlineState", () => {
   it("status terminal sem prazo continua sem_prazo, nunca no_prazo", () => {
     expect(deadlineState(null, "concluida", now)).toBe("sem_prazo");
     expect(deadlineState(null, "cancelada", now)).toBe("sem_prazo");
+  });
+
+  it("contadores: terminal fica fora de tudo; sem_prazo nunca soma no que está bem", () => {
+    const counts = deadlineCounts(
+      [
+        { dueDate: day("2026-07-09"), status: "aberta" }, // atrasada
+        { dueDate: day("2026-07-10"), status: "em_andamento" }, // vencendo (hoje)
+        { dueDate: day("2026-07-11"), status: "aberta" }, // vencendo (amanhã)
+        { dueDate: day("2026-08-01"), status: "aberta" }, // no_prazo
+        { dueDate: null, status: "aberta" }, // sem prazo
+        { dueDate: day("2026-07-01"), status: "concluida" }, // terminal: fora
+        { dueDate: null, status: "cancelada" }, // terminal: fora
+      ],
+      now,
+    );
+    expect(counts).toEqual({
+      emAberto: 5,
+      vencendo: 2,
+      atrasada: 1,
+      semPrazo: 1,
+    });
+  });
+
+  it("contadores zerados para carteira vazia ou só terminais", () => {
+    expect(deadlineCounts([], now)).toEqual({
+      emAberto: 0,
+      vencendo: 0,
+      atrasada: 0,
+      semPrazo: 0,
+    });
+    expect(
+      deadlineCounts([{ dueDate: day("2026-07-01"), status: "concluida" }], now),
+    ).toEqual({ emAberto: 0, vencendo: 0, atrasada: 0, semPrazo: 0 });
   });
 
   it("'hoje' é o dia de Brasília, não o do servidor em UTC", () => {

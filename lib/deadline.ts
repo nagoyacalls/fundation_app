@@ -4,6 +4,15 @@
 
 import { TERMINAL_DEMAND_STATUSES, type DemandStatus } from "./validations";
 
+export interface DeadlineCounts {
+  /** Demandas com status não terminal. */
+  emAberto: number;
+  vencendo: number;
+  atrasada: number;
+  /** Não terminais sem data — a lacuna fica visível, nunca somada ao que está bem. */
+  semPrazo: number;
+}
+
 export type DeadlineState = "sem_prazo" | "no_prazo" | "vencendo" | "atrasada";
 
 export const DEADLINE_STATES: readonly DeadlineState[] = [
@@ -70,4 +79,37 @@ export function deadlineState(
     return "vencendo";
   }
   return "no_prazo";
+}
+
+/**
+ * Contadores de painel. Status terminal fica fora de TODAS as contagens —
+ * o prazo deixou de correr — e sem_prazo é contado à parte, nunca somado.
+ * O chamador passa apenas demandas confirmadas: palpite não entra em
+ * indicador (invariante do CLAUDE.md).
+ */
+export function deadlineCounts(
+  demands: ReadonlyArray<{ dueDate: Date | null; status: DemandStatus }>,
+  now: Date,
+): DeadlineCounts {
+  const counts: DeadlineCounts = {
+    emAberto: 0,
+    vencendo: 0,
+    atrasada: 0,
+    semPrazo: 0,
+  };
+  for (const demand of demands) {
+    if (TERMINAL_DEMAND_STATUSES.has(demand.status)) {
+      continue;
+    }
+    counts.emAberto += 1;
+    const state = deadlineState(demand.dueDate, demand.status, now);
+    if (state === "vencendo") {
+      counts.vencendo += 1;
+    } else if (state === "atrasada") {
+      counts.atrasada += 1;
+    } else if (state === "sem_prazo") {
+      counts.semPrazo += 1;
+    }
+  }
+  return counts;
 }
