@@ -80,17 +80,17 @@ Depende de: 7.
 
 ---
 
-## Etapa 9 — Analítica
+## Etapa 9 — Analítica (concluída)
 
 Depende de: 8 e da consolidação de categorias.
 
-- [ ] Evolução de volume no tempo.
-- [ ] Taxa de conclusão e de cancelamento.
-- [ ] Tempo médio de atendimento (`closedAt − openedAt`).
-- [ ] Cumprimento de prazo: concluídas dentro do `dueDate` vs. fora.
-- [ ] Demandas por categoria e por analista.
+- [x] Evolução de volume no tempo.
+- [x] Taxa de conclusão e de cancelamento.
+- [x] Tempo médio de atendimento (`closedAt − openedAt`).
+- [x] Cumprimento de prazo: concluídas dentro do `dueDate` vs. fora.
+- [x] Demandas por categoria e por analista.
 
-**Pré-requisito:** promover `Demand.category` de texto livre a referência a uma tabela `Category`. Fazer antes de acumular dados, ou os gráficos nascem com categorias duplicadas por diferença de grafia.
+**Pré-requisito (feito):** `Demand.category` promovido a tabela `Category` com backfill normalizado — `lib/category.ts`.
 
 ---
 
