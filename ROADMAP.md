@@ -70,13 +70,13 @@ Depende de: 6.
 
 ---
 
-## Etapa 8 — Home
+## Etapa 8 — Home (concluída)
 
 Depende de: 7.
 
-- [ ] Cards de empresa: abertas, vencendo, atrasadas, sem prazo, concluídas no período.
-- [ ] Card de **Não classificado** com a contagem da fila de revisão.
-- [ ] Nenhuma demanda não confirmada entra em qualquer contagem exceto a do card de revisão.
+- [x] Cards de empresa: abertas, vencendo, atrasadas, sem prazo, concluídas no período.
+- [x] Card de **Não classificado** com a contagem da fila de revisão.
+- [x] Nenhuma demanda não confirmada entra em qualquer contagem exceto a do card de revisão.
 
 ---
 
