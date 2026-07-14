@@ -2,10 +2,14 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { ReauthBanner } from "./reauth-banner";
+import { Button } from "@/components/ui/button";
+import { auth, signOut } from "@/lib/auth";
 
 // Shell das telas autenticadas. A proteção de acesso é do middleware.ts —
 // aqui só o cromo (nav + banner). Ver CLAUDE.md: segurança é opt-out.
-export default function AppLayout({ children }: { children: ReactNode }) {
+export default async function AppLayout({ children }: { children: ReactNode }) {
+  const session = await auth();
+
   return (
     <>
       <ReauthBanner />
@@ -27,6 +31,21 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           >
             Demandas
           </Link>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              {session?.user?.email}
+            </span>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
+            >
+              <Button type="submit" variant="ghost" size="sm">
+                Sair
+              </Button>
+            </form>
+          </div>
         </nav>
       </header>
       {children}
