@@ -32,9 +32,9 @@ export default async function RevisaoPage() {
   ]);
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4">
+    <main className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-9 max-lg:p-4">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-lg font-semibold">Revisão</h1>
+        <h1 className="text-[22px] font-bold">Revisão</h1>
         <p className="text-sm text-muted-foreground">
           {demands.length === 0
             ? "Fila vazia"
@@ -43,7 +43,7 @@ export default async function RevisaoPage() {
       </div>
 
       {demands.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-md border border-dashed p-8 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-input p-10 text-center">
           <p className="text-sm text-muted-foreground">
             Nenhuma demanda aguardando revisão.
           </p>
@@ -52,7 +52,7 @@ export default async function RevisaoPage() {
           </Button>
         </div>
       ) : (
-        <ul className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-5">
           {demands.map((demand) => (
             <ReviewItem
               key={demand.id}

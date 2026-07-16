@@ -9,13 +9,14 @@ import {
   updateDemandStatus,
   type ActionResult,
 } from "./actions";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { DeadlineState } from "@/lib/deadline";
 import type { DemandStatus } from "@/lib/validations";
 
-const selectClass =
-  "border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-sm shadow-xs outline-none focus-visible:ring-[3px] disabled:opacity-50";
+const controlClass =
+  "border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-9 shrink-0 rounded-md border bg-transparent px-1.5 text-[13px] outline-none focus-visible:ring-[3px] disabled:opacity-50";
+
+const pillClass =
+  "shrink-0 truncate rounded-full bg-secondary px-3 py-1 text-[13px] font-semibold text-ink-soft";
 
 const STATUS_LABELS: Record<DemandStatus, string> = {
   aberta: "Aberta",
@@ -40,13 +41,29 @@ export interface DemandRowData {
 }
 
 // Destaque reservado a estado (docs/ui.md): atrasada forte, vencendo médio,
-// no_prazo sem destaque. sem_prazo é aviso discreto ao lado do campo de data.
+// no_prazo sem destaque. sem_prazo é o aviso discreto ao lado do campo de
+// data, exigido por docs/prazos.md — o design omitia; o contrato vence.
 function DeadlineBadge({ deadline }: { deadline: DeadlineState }) {
   if (deadline === "atrasada") {
-    return <Badge variant="destructive">Atrasada</Badge>;
+    return (
+      <span className="shrink-0 whitespace-nowrap rounded-full bg-destructive px-3 py-1 text-[13px] font-bold text-white">
+        Atrasada
+      </span>
+    );
   }
   if (deadline === "vencendo") {
-    return <Badge>Vencendo</Badge>;
+    return (
+      <span className="shrink-0 whitespace-nowrap rounded-full bg-primary px-3 py-1 text-[13px] font-bold text-white">
+        Vencendo
+      </span>
+    );
+  }
+  if (deadline === "sem_prazo") {
+    return (
+      <span className="shrink-0 whitespace-nowrap text-xs text-muted-foreground">
+        sem prazo definido
+      </span>
+    );
   }
   return null;
 }
@@ -76,36 +93,32 @@ export function DemandRow({
   );
 
   return (
-    <li className="flex flex-col gap-2 p-4">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <div className="min-w-0 flex-1 basis-64">
+    <li className="min-w-[960px] border-b last:border-b-0">
+      <div className="flex h-[76px] items-center gap-4 px-5">
+        <div className="min-w-[180px] flex-1">
           <p className="truncate text-sm font-medium">{demand.subject}</p>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="truncate text-[13px] text-muted-foreground">
             {demand.senderEmail || "remetente desconhecido"}
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
-          {demand.companyName && demand.companyId ? (
-            <Badge variant="secondary" asChild>
-              <Link href={`/empresas/${demand.companyId}`}>
-                {demand.companyName}
-              </Link>
-            </Badge>
-          ) : null}
-          {demand.category ? (
-            <Badge variant="outline">{demand.category}</Badge>
-          ) : null}
-          <DeadlineBadge deadline={demand.deadline} />
-        </div>
+        {demand.companyName && demand.companyId ? (
+          <Link
+            href={`/empresas/${demand.companyId}`}
+            className={`${pillClass} w-[130px] text-center transition-colors hover:bg-muted`}
+          >
+            {demand.companyName}
+          </Link>
+        ) : null}
 
-        <form action={dueAction} className="flex shrink-0 items-center gap-2">
+        {demand.category ? (
+          <span className={`${pillClass} max-w-[130px]`}>{demand.category}</span>
+        ) : null}
+
+        <DeadlineBadge deadline={demand.deadline} />
+
+        <form action={dueAction} className="shrink-0">
           <input type="hidden" name="demandId" value={demand.id} />
-          {demand.deadline === "sem_prazo" ? (
-            <span className="text-xs text-muted-foreground">
-              sem prazo definido
-            </span>
-          ) : null}
           <input
             type="date"
             name="dueDate"
@@ -116,7 +129,7 @@ export function DemandRow({
             defaultValue={demand.dueDate ?? ""}
             disabled={duePending}
             onChange={(event) => event.currentTarget.form?.requestSubmit()}
-            className={selectClass}
+            className={`${controlClass} w-[130px]`}
           />
         </form>
 
@@ -129,7 +142,7 @@ export function DemandRow({
             defaultValue={demand.status}
             disabled={statusPending}
             onChange={(event) => event.currentTarget.form?.requestSubmit()}
-            className={selectClass}
+            className={`${controlClass} w-[120px]`}
           >
             {Object.entries(STATUS_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -148,7 +161,7 @@ export function DemandRow({
             defaultValue={demand.assigneeId ?? ""}
             disabled={assignPending}
             onChange={(event) => event.currentTarget.form?.requestSubmit()}
-            className={selectClass}
+            className={`${controlClass} w-[140px]`}
           >
             <option value="">Sem responsável</option>
             {users.map((user) => (
@@ -160,19 +173,26 @@ export function DemandRow({
         </form>
 
         {demand.webLink ? (
-          <Button asChild variant="ghost" size="sm" className="shrink-0">
-            <a href={demand.webLink} target="_blank" rel="noreferrer">
-              Outlook
-            </a>
-          </Button>
+          <a
+            href={demand.webLink}
+            target="_blank"
+            rel="noreferrer"
+            className="shrink-0 text-[13px] text-brand transition-colors hover:text-primary"
+          >
+            Outlook
+          </a>
         ) : null}
       </div>
 
-      {errors.map((state, index) => (
-        <p key={index} role="alert" className="text-sm text-destructive">
-          {state.error}
-        </p>
-      ))}
+      {errors.length > 0 ? (
+        <div className="flex flex-col gap-1 px-5 pb-3">
+          {errors.map((state, index) => (
+            <p key={index} role="alert" className="text-sm text-destructive">
+              {state.error}
+            </p>
+          ))}
+        </div>
+      ) : null}
     </li>
   );
 }

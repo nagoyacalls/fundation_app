@@ -85,9 +85,9 @@ export default async function DemandasPage({
   const hasFilters = Boolean(q || empresa || categoria || resp || status || prazo);
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4">
+    <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 p-9 max-lg:p-4">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-lg font-semibold">Demandas</h1>
+        <h1 className="text-[22px] font-bold">Demandas</h1>
         <p className="text-sm text-muted-foreground">
           {rows.length === 0
             ? "Nenhum resultado"
@@ -98,7 +98,7 @@ export default async function DemandasPage({
       <DemandFilters companies={companies} users={users} categories={categories} />
 
       {rows.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-md border border-dashed p-8 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-input p-10 text-center">
           <p className="text-sm text-muted-foreground">
             {hasFilters
               ? "Nenhuma demanda com esses filtros."
@@ -113,7 +113,8 @@ export default async function DemandasPage({
           </Button>
         </div>
       ) : (
-        <ul className="flex flex-col divide-y rounded-md border">
+        <div className="overflow-x-auto rounded-2xl border bg-card">
+          <ul className="flex flex-col">
           {rows.map(({ demand, deadline }) => (
             <DemandRow
               key={demand.id}
@@ -133,7 +134,8 @@ export default async function DemandasPage({
               users={users}
             />
           ))}
-        </ul>
+          </ul>
+        </div>
       )}
     </main>
   );

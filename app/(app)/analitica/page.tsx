@@ -55,9 +55,9 @@ export default async function AnaliticaPage() {
 
   if (demands.length === 0) {
     return (
-      <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4">
-        <h1 className="text-lg font-semibold">Analítica</h1>
-        <div className="flex flex-col items-center gap-4 rounded-md border border-dashed p-8 text-center">
+      <main className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-9 max-lg:p-4">
+        <h1 className="text-[22px] font-bold">Analítica</h1>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-input p-10 text-center">
           <p className="text-sm text-muted-foreground">
             Nenhuma demanda confirmada ainda — os indicadores nascem da revisão.
           </p>
@@ -85,8 +85,8 @@ export default async function AnaliticaPage() {
   );
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4">
-      <h1 className="text-lg font-semibold">Analítica</h1>
+    <main className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-9 max-lg:p-4">
+      <h1 className="text-[22px] font-bold">Analítica</h1>
 
       <dl className="grid grid-cols-4 gap-4">
         <StatTile label="Demandas confirmadas" value={String(rates.total)} />
@@ -107,7 +107,7 @@ export default async function AnaliticaPage() {
         />
       </dl>
 
-      <section className="rounded-md border p-4">
+      <section className="rounded-2xl border bg-card p-5">
         <h2 className="mb-4 text-sm font-medium">
           Volume de demandas · últimos {VOLUME_MONTHS} meses
         </h2>
@@ -121,7 +121,7 @@ export default async function AnaliticaPage() {
                 {bucket.total}
               </span>
               <div
-                className="w-full max-w-16 rounded-t-[4px] bg-primary"
+                className="w-8 rounded-t-[4px] bg-brand"
                 style={{ height: `${(bucket.total / maxVolume) * 100}%` }}
                 aria-label={`${monthLabel(bucket.month)}: ${bucket.total}`}
               />
@@ -133,7 +133,7 @@ export default async function AnaliticaPage() {
         </div>
       </section>
 
-      <section className="rounded-md border p-4">
+      <section className="rounded-2xl border bg-card p-5">
         <h2 className="mb-1 text-sm font-medium">Cumprimento de prazo</h2>
         <p className="mb-4 text-xs text-muted-foreground">
           concluídas dentro do prazo digitado vs. fora; sem prazo fica visível,
@@ -170,10 +170,10 @@ function StatTile({
   alert?: boolean;
 }) {
   return (
-    <div className="rounded-md border p-4">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
+    <div className="rounded-2xl border bg-card p-5">
+      <dt className="text-[13px] text-muted-foreground">{label}</dt>
       <dd
-        className={`text-2xl font-semibold tabular-nums ${alert ? "text-destructive" : ""}`}
+        className={`mt-1 text-[28px] font-bold tabular-nums ${alert ? "text-destructive" : ""}`}
       >
         {value}
       </dd>
@@ -191,17 +191,17 @@ function RankList({
 }) {
   const max = Math.max(...rows.map((row) => row.total), 1);
   return (
-    <section className="rounded-md border p-4">
+    <section className="rounded-2xl border bg-card p-5">
       <h2 className="mb-4 text-sm font-medium">{title}</h2>
       <ul className="flex flex-col gap-2">
         {rows.map((row) => (
           <li key={row.label} className="flex items-center gap-2">
-            <span className="w-36 truncate text-xs text-muted-foreground">
+            <span className="w-36 shrink-0 truncate text-[13px] text-ink-soft">
               {row.label}
             </span>
-            <div className="h-2 flex-1 rounded-full bg-muted">
+            <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-2 rounded-full bg-primary"
+                className="h-full rounded-full bg-brand"
                 style={{ width: `${(row.total / max) * 100}%` }}
               />
             </div>

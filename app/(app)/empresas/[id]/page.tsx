@@ -109,10 +109,10 @@ export default async function EmpresaPage({
   ];
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4">
+    <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 p-9 max-lg:p-4">
       <div className="flex items-baseline justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="truncate text-lg font-semibold">{company.name}</h1>
+          <h1 className="truncate text-[22px] font-bold">{company.name}</h1>
           <p className="truncate text-sm text-muted-foreground">
             {company.domains.length > 0
               ? company.domains.map((route) => route.domain).join(" · ")
@@ -129,10 +129,10 @@ export default async function EmpresaPage({
 
       <dl className="grid grid-cols-4 gap-4">
         {counters.map((counter) => (
-          <div key={counter.label} className="rounded-md border p-4">
-            <dt className="text-xs text-muted-foreground">{counter.label}</dt>
+          <div key={counter.label} className="rounded-2xl border bg-card p-5">
+            <dt className="text-[13px] text-muted-foreground">{counter.label}</dt>
             <dd
-              className={`text-2xl font-semibold tabular-nums ${
+              className={`mt-1 text-[28px] font-bold tabular-nums ${
                 counter.alert ? "text-destructive" : ""
               }`}
             >
@@ -145,7 +145,7 @@ export default async function EmpresaPage({
       <DemandFilters users={users} categories={categories} />
 
       {rows.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-md border border-dashed p-8 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-input p-10 text-center">
           <p className="text-sm text-muted-foreground">
             {hasFilters
               ? "Nenhuma demanda com esses filtros."
@@ -160,7 +160,8 @@ export default async function EmpresaPage({
           </Button>
         </div>
       ) : (
-        <ul className="flex flex-col divide-y rounded-md border">
+        <div className="overflow-x-auto rounded-2xl border bg-card">
+          <ul className="flex flex-col">
           {rows.map(({ demand, deadline }) => (
             <DemandRow
               key={demand.id}
@@ -180,7 +181,8 @@ export default async function EmpresaPage({
               users={users}
             />
           ))}
-        </ul>
+          </ul>
+        </div>
       )}
     </main>
   );

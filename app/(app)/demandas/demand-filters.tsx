@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 
 const selectClass =
-  "border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-9 rounded-md border bg-transparent px-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]";
+  "border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border bg-card px-2 text-sm outline-none focus-visible:ring-[3px]";
 
 const STATUS_OPTIONS = [
   ["aberta", "Aberta"],
@@ -58,7 +58,7 @@ export function DemandFilters({
         type="search"
         placeholder="Buscar assunto ou remetente…"
         defaultValue={searchParams.get("q") ?? ""}
-        className="h-9 w-64"
+        className="h-10 w-64 min-w-[220px] flex-1 bg-card sm:max-w-xs"
         aria-label="Buscar por assunto ou remetente"
       />
       {companies ? (
