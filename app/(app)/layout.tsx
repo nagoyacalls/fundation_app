@@ -1,60 +1,53 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { NavLinks } from "./nav-links";
 import { ReauthBanner } from "./reauth-banner";
-import { Button } from "@/components/ui/button";
 import { auth, signOut } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 // Shell das telas autenticadas. A proteção de acesso é do middleware.ts —
-// aqui só o cromo (nav + banner). Ver CLAUDE.md: segurança é opt-out.
+// aqui só o cromo (banner + nav navy da marca). Ver CLAUDE.md.
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const session = await auth();
+  const [session, reviewCount] = await Promise.all([
+    auth(),
+    prisma.demand.count({ where: { classificationConfirmed: false } }),
+  ]);
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <ReauthBanner />
-      <header className="border-b">
-        <nav className="mx-auto flex max-w-5xl items-center gap-4 p-4 text-sm">
-          <span className="font-semibold">Departamento Pessoal</span>
-          <Link href="/" className="text-muted-foreground hover:text-foreground">
-            Home
-          </Link>
-          <Link
-            href="/revisao"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Revisão
-          </Link>
-          <Link
-            href="/demandas"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Demandas
-          </Link>
-          <Link
-            href="/analitica"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Analítica
-          </Link>
-          <div className="ml-auto flex items-center gap-2">
-            <span className="hidden text-xs text-muted-foreground sm:inline">
-              {session?.user?.email}
+      <header className="flex h-[72px] shrink-0 items-center justify-between gap-10 bg-primary px-8">
+        <div className="flex min-w-0 items-center gap-9">
+          <div className="flex items-baseline gap-2.5">
+            <span className="text-lg font-extrabold tracking-wide text-white">
+              NUMERALLE
             </span>
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/login" });
-              }}
-            >
-              <Button type="submit" variant="ghost" size="sm">
-                Sair
-              </Button>
-            </form>
+            <span className="text-[11px] font-bold tracking-[0.18em] text-brand-muted">
+              ASSESSORIA CONTÁBIL
+            </span>
           </div>
-        </nav>
+          <NavLinks reviewCount={reviewCount} />
+        </div>
+        <div className="flex shrink-0 items-center gap-5">
+          <span className="hidden text-[13px] text-white/65 sm:inline">
+            {session?.user?.email}
+          </span>
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/login" });
+            }}
+          >
+            <button
+              type="submit"
+              className="cursor-pointer text-sm text-white/65 transition-colors hover:text-white"
+            >
+              Sair
+            </button>
+          </form>
+        </div>
       </header>
-      {children}
-    </>
+      <div className="flex flex-1 flex-col">{children}</div>
+    </div>
   );
 }

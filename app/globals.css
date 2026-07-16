@@ -2,47 +2,64 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Tema Numeralle (Claude Design "Departamento Pessoal"): navy como tinta,
+   teal como única cor de destaque, cinzas slate, vermelho reservado a estado. */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+  --background: #f1f5f9;
+  --foreground: #0b2545;
+  --card: #ffffff;
+  --card-foreground: #0b2545;
+  --popover: #ffffff;
+  --popover-foreground: #0b2545;
+  --primary: #0b2545;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #13315c;
+  --muted: #e2e8f0;
+  --muted-foreground: #475569;
+  --accent: #e2e8f0;
+  --accent-foreground: #0b2545;
+  --destructive: #dc2626;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: #0d9488;
+  /* Marca: teal de destaque e sua variante clara (badge da nav). */
+  --brand: #0d9488;
+  --brand-foreground: #ffffff;
+  --brand-muted: #5eead4;
+  /* Superfícies de estado de erro (banner, erro inline). */
+  --destructive-muted: #fef2f2;
+  --destructive-border: #fecaca;
+  /* Tinta secundária do design (títulos de apoio, valores de rank). */
+  --ink-soft: #13315c;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: #0b2545;
+  --foreground: #f1f5f9;
+  --card: #13315c;
+  --card-foreground: #f1f5f9;
+  --popover: #13315c;
+  --popover-foreground: #f1f5f9;
+  --primary: #f1f5f9;
+  --primary-foreground: #0b2545;
+  --secondary: #13315c;
+  --secondary-foreground: #f1f5f9;
+  --muted: #13315c;
+  --muted-foreground: #94a3b8;
+  --accent: #13315c;
+  --accent-foreground: #f1f5f9;
+  --destructive: #f87171;
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: #0d9488;
+  --brand: #0d9488;
+  --brand-foreground: #ffffff;
+  --brand-muted: #5eead4;
+  --destructive-muted: oklch(0.3 0.08 25);
+  --destructive-border: oklch(0.4 0.1 25);
+  --ink-soft: #cbd5e1;
 }
 
 @theme inline {
@@ -68,6 +85,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-muted: var(--brand-muted);
+  --color-destructive-muted: var(--destructive-muted);
+  --color-destructive-border: var(--destructive-border);
+  --color-ink-soft: var(--ink-soft);
 }
 
 @layer base {

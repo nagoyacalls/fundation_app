@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { auth, signIn } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -25,30 +24,31 @@ export async function ReauthBanner() {
   return (
     <div
       role="alert"
-      className="border-b border-destructive/30 bg-destructive/10 px-4 py-2"
+      className="flex items-center justify-between gap-4 border-b border-destructive-border bg-destructive-muted px-8 py-4"
     >
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 text-sm">
-        <span className="text-destructive">
-          Sua conta parou de sincronizar. Reconecte para voltar a receber
-          demandas do Outlook.
-        </span>
-        <form
-          action={async () => {
-            "use server";
-            // prompt: consent força o Entra a devolver um refresh token novo,
-            // que o login silencioso costuma omitir (docs/sync.md).
-            await signIn(
-              "microsoft-entra-id",
-              { redirectTo: "/" },
-              { prompt: "consent" },
-            );
-          }}
+      <p className="text-base text-destructive">
+        Sua conta parou de sincronizar. Reconecte para voltar a receber
+        demandas do Outlook.
+      </p>
+      <form
+        action={async () => {
+          "use server";
+          // prompt: consent força o Entra a devolver um refresh token novo,
+          // que o login silencioso costuma omitir (docs/sync.md).
+          await signIn(
+            "microsoft-entra-id",
+            { redirectTo: "/" },
+            { prompt: "consent" },
+          );
+        }}
+      >
+        <button
+          type="submit"
+          className="h-10 cursor-pointer rounded-full border border-destructive bg-white px-5 text-[15px] font-semibold text-destructive transition-colors hover:bg-destructive-muted"
         >
-          <Button type="submit" size="sm" variant="outline">
-            Reconectar
-          </Button>
-        </form>
-      </div>
+          Reconectar
+        </button>
+      </form>
     </div>
   );
 }
