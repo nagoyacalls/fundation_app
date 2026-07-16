@@ -24,7 +24,7 @@ export function NavLinks({ reviewCount }: { reviewCount: number }) {
         <Link
           key={link.href}
           href={link.href}
-          className={`flex items-center gap-1.5 text-sm transition-colors ${
+          className={`group flex items-center gap-1.5 text-sm transition-colors ${
             isActive(link.href)
               ? "font-semibold text-white"
               : "text-white/65 hover:text-white"
@@ -32,7 +32,7 @@ export function NavLinks({ reviewCount }: { reviewCount: number }) {
         >
           {link.label}
           {link.href === "/revisao" && reviewCount > 0 ? (
-            <span className="rounded-full bg-brand-muted px-2 py-0.5 text-xs font-bold leading-none text-primary">
+            <span className="rounded-full bg-brand-muted px-2 py-0.5 text-xs font-bold leading-none text-primary transition-transform duration-150 group-hover:scale-110">
               {reviewCount}
             </span>
           ) : null}

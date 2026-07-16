@@ -48,7 +48,7 @@ export function ReviewItem({
   );
 
   return (
-    <li className="flex flex-col gap-3.5 rounded-2xl border bg-card p-5">
+    <li className="flex animate-fade-up flex-col gap-3.5 rounded-2xl border bg-card p-5 transition-shadow duration-150 hover:shadow-md">
       <div className="flex items-start justify-between gap-5">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold">{demand.subject}</p>

@@ -93,8 +93,8 @@ export function DemandRow({
   );
 
   return (
-    <li className="min-w-[960px] border-b last:border-b-0">
-      <div className="flex h-[76px] items-center gap-4 px-5">
+    <li className="min-w-[960px] animate-fade-up border-b last:border-b-0">
+      <div className="flex h-[76px] items-center gap-4 px-5 transition-colors duration-150 hover:bg-secondary/50">
         <div className="min-w-[180px] flex-1">
           <p className="truncate text-sm font-medium">{demand.subject}</p>
           <p className="truncate text-[13px] text-muted-foreground">
@@ -105,7 +105,7 @@ export function DemandRow({
         {demand.companyName && demand.companyId ? (
           <Link
             href={`/empresas/${demand.companyId}`}
-            className={`${pillClass} w-[130px] text-center transition-colors hover:bg-muted`}
+            className={`${pillClass} w-[130px] text-center transition-all duration-150 hover:scale-105 hover:bg-muted active:scale-100`}
           >
             {demand.companyName}
           </Link>

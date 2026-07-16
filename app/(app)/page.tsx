@@ -56,7 +56,7 @@ export default async function Home() {
 
       <Link
         href="/revisao"
-        className="flex items-center justify-between rounded-2xl border border-dashed border-input p-5 transition-colors hover:bg-card"
+        className="group flex animate-fade-up items-center justify-between rounded-2xl border border-dashed border-input p-5 transition-all duration-150 hover:scale-[1.01] hover:bg-card hover:shadow-md active:scale-100"
       >
         <div>
           <p className="text-sm font-medium">Não classificado</p>
@@ -65,7 +65,7 @@ export default async function Home() {
           </p>
         </div>
         <span
-          className={`rounded-full px-3.5 py-1.5 text-sm font-bold ${
+          className={`rounded-full px-3.5 py-1.5 text-sm font-bold transition-transform duration-150 group-hover:scale-110 ${
             reviewQueueCount > 0
               ? "bg-brand-muted text-primary"
               : "bg-muted text-muted-foreground"
@@ -86,11 +86,15 @@ export default async function Home() {
         </div>
       ) : (
         <ul className="grid grid-cols-2 gap-6 lg:grid-cols-3">
-          {cards.map((card) => (
-            <li key={card.id}>
+          {cards.map((card, index) => (
+            <li
+              key={card.id}
+              className="animate-fade-up"
+              style={{ animationDelay: `${index * 40}ms` }}
+            >
               <Link
                 href={`/empresas/${card.id}`}
-                className="flex h-full flex-col gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-input"
+                className="flex h-full flex-col gap-4 rounded-2xl border bg-card p-5 transition-all duration-150 hover:scale-[1.02] hover:border-input hover:shadow-lg active:scale-[0.99]"
               >
                 <p className="truncate text-sm font-semibold">{card.name}</p>
                 <dl className="flex flex-col gap-2">

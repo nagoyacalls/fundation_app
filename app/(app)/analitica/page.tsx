@@ -121,7 +121,7 @@ export default async function AnaliticaPage() {
                 {bucket.total}
               </span>
               <div
-                className="w-8 rounded-t-[4px] bg-brand"
+                className="w-8 origin-bottom animate-grow-y rounded-t-[4px] bg-brand"
                 style={{ height: `${(bucket.total / maxVolume) * 100}%` }}
                 aria-label={`${monthLabel(bucket.month)}: ${bucket.total}`}
               />
@@ -170,7 +170,7 @@ function StatTile({
   alert?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border bg-card p-5">
+    <div className="animate-fade-up rounded-2xl border bg-card p-5">
       <dt className="text-[13px] text-muted-foreground">{label}</dt>
       <dd
         className={`mt-1 text-[28px] font-bold tabular-nums ${alert ? "text-destructive" : ""}`}
@@ -201,7 +201,7 @@ function RankList({
             </span>
             <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-brand"
+                className="h-full origin-left animate-grow-x rounded-full bg-brand"
                 style={{ width: `${(row.total / max) * 100}%` }}
               />
             </div>

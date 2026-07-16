@@ -128,8 +128,12 @@ export default async function EmpresaPage({
       </div>
 
       <dl className="grid grid-cols-4 gap-4">
-        {counters.map((counter) => (
-          <div key={counter.label} className="rounded-2xl border bg-card p-5">
+        {counters.map((counter, index) => (
+          <div
+            key={counter.label}
+            className="animate-fade-up rounded-2xl border bg-card p-5"
+            style={{ animationDelay: `${index * 40}ms` }}
+          >
             <dt className="text-[13px] text-muted-foreground">{counter.label}</dt>
             <dd
               className={`mt-1 text-[28px] font-bold tabular-nums ${
